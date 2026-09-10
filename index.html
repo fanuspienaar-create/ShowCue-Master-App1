@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ShowCue">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>ShowCue</title>
+<style>
+:root{--bg:#070b10;--panel:#0e151d;--panel2:#121b25;--line:#263341;--text:#f5f7fa;--muted:#aab5c0;--orange:#ff6a00;--orange2:#ff8b2a;--safe:env(safe-area-inset-bottom)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}
+button{font:inherit;color:inherit;border:0}
+.app{display:grid;grid-template-columns:240px 1fr;grid-template-rows:1fr 88px;height:100dvh;min-height:480px}
+.sidebar{grid-row:1/3;background:rgba(6,10,15,.96);border-right:1px solid var(--line);padding:22px 14px;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;margin:0 8px 24px}
+.brand img{width:42px;height:42px;border-radius:12px}.brand b{font-size:24px}.brand span{color:var(--orange)}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav button{background:transparent;text-align:left;padding:14px 13px;border-radius:12px;color:#dce3e9;cursor:pointer}
+.nav button.active,.nav button:active{background:rgba(255,106,0,.16);color:#fff}
+.nav button.active{box-shadow:inset 3px 0 var(--orange)}
+.main{position:relative;overflow:auto;background:linear-gradient(rgba(5,9,14,.64),rgba(5,9,14,.95)),url("assets/showcue-artwork.jpg") center top/cover fixed}
+.content{max-width:1250px;margin:auto;padding:28px 28px 110px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:22px}
+.logo{width:min(430px,70vw);max-height:90px;object-fit:contain;object-position:left center}
+.tag{color:#fff;font-size:13px;letter-spacing:3px;opacity:.85;margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{min-height:145px;border:1px solid rgba(255,255,255,.24);border-radius:16px;padding:22px;background:linear-gradient(135deg,rgba(255,106,0,.82),rgba(75,28,5,.62));box-shadow:0 12px 30px rgba(0,0,0,.22);cursor:pointer;text-align:left}
+.card:nth-child(2){background:linear-gradient(135deg,rgba(145,32,54,.85),rgba(50,13,23,.72))}
+.card:nth-child(3){background:linear-gradient(135deg,rgba(74,39,145,.88),rgba(28,15,60,.72))}
+.card:nth-child(4){background:linear-gradient(135deg,rgba(0,117,186,.88),rgba(4,39,60,.72))}
+.card:nth-child(5){background:linear-gradient(135deg,rgba(0,128,91,.88),rgba(2,52,38,.72))}
+.card:nth-child(6){background:linear-gradient(135deg,rgba(171,130,0,.88),rgba(66,48,0,.72))}
+.card:nth-child(7){background:linear-gradient(135deg,rgba(45,62,77,.9),rgba(12,19,26,.82))}
+.card:nth-child(8){background:linear-gradient(135deg,rgba(0,137,157,.88),rgba(2,57,66,.72))}
+.card:nth-child(9){background:linear-gradient(135deg,rgba(35,45,57,.9),rgba(10,14,19,.82))}
+.card .ico{font-size:38px;margin-bottom:12px}.card h2{font-size:19px;margin:0 0 6px}.card p{margin:0;color:#e2e8ee;font-size:13px;line-height:1.35}
+.view{display:none}.view.active{display:block}
+.section{background:rgba(10,15,21,.92);border:1px solid var(--line);border-radius:16px;padding:20px}
+.list{display:grid;gap:10px}.row{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#0d141c}
+.row .grow{flex:1}.pill{font-size:12px;color:#b9c5cf}.btn{background:#18222c;border:1px solid #344452;border-radius:10px;padding:10px 14px;cursor:pointer}.btn.primary{background:var(--orange);border-color:var(--orange);color:#111;font-weight:700}
+.padgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.pad{min-height:130px;border-radius:15px;padding:15px;background:#1b2430;border:1px solid #445466;cursor:pointer;position:relative}.pad.play{background:linear-gradient(145deg,#ff6a00,#8d3000)}.pad .edit{position:absolute;right:8px;top:8px;border-radius:8px;padding:7px;background:rgba(0,0,0,.3);cursor:pointer}
+.transport{grid-column:2;grid-row:2;background:rgba(5,9,13,.98);border-top:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:10px 18px calc(10px + var(--safe));z-index:5}
+.track{display:flex;align-items:center;gap:10px;min-width:190px;flex:1}.thumb{width:50px;height:50px;border-radius:9px;object-fit:cover}.track small{display:block;color:var(--muted);margin-top:3px}
+.transport button{background:transparent;min-width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:21px}.transport button:active{background:#1c2732}.transport .play{border:2px solid #fff;width:52px;height:52px;font-size:25px}.time{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;white-space:nowrap}
+.status{position:fixed;left:15px;bottom:calc(5px + var(--safe));font-size:11px;color:#8ed48e;z-index:10}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:30;padding:20px}.modal.open{display:flex}.modalbox{width:min(520px,100%);background:#101821;border:1px solid #354454;border-radius:18px;padding:22px}.modalbox h2{margin-top:0}.modalbox input{width:100%;background:#0a1016;border:1px solid #344452;color:#fff;padding:12px;border-radius:9px;margin:8px 0 16px}
+.tv{position:fixed;inset:0;background:#000;z-index:40;display:none;align-items:center;justify-content:center;text-align:center;padding:5vw}.tv.open{display:flex}.tv .close{position:absolute;top:20px;right:20px;background:#222;padding:12px 16px;border-radius:10px}.tv h1{font-size:clamp(32px,7vw,90px);margin:0 0 20px}.tv p{font-size:clamp(20px,3vw,42px);color:#dbe2e8}
+@media(max-width:900px){.app{grid-template-columns:1fr;grid-template-rows:1fr 72px}.sidebar{grid-row:2;grid-column:1;display:flex;padding:6px 8px;overflow-x:auto;border-right:0;border-top:1px solid var(--line);z-index:8}.brand,.nav button span{display:none}.nav{flex-direction:row;width:100%;justify-content:space-around}.nav button{min-width:56px;text-align:center;padding:9px}.nav button::first-letter{font-size:21px}.transport{grid-column:1;grid-row:1;position:fixed;left:0;right:0;bottom:72px}.content{padding:18px 14px 170px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{min-height:125px;padding:16px}.padgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.grid{grid-template-columns:1fr 1fr;gap:9px}.card{min-height:112px;padding:13px}.card .ico{font-size:29px}.card h2{font-size:15px}.card p{font-size:11px}.logo{width:80vw}.track{min-width:0}.track>div{display:none}.transport{gap:5px;padding-left:9px;padding-right:9px}.transport .time{display:none}.transport button{min-width:36px}.transport .play{width:46px;height:46px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><img src="assets/icon-192.png"><div><b>Show<span>Cue</span></b><div class="pill">PLAY. PERFORM. INSPIRE.</div></div></div>
+  <nav class="nav">
+    <button class="active" data-view="home">⌂ <span>Home</span></button>
+    <button data-view="setlist">☷ <span>Setlist</span></button>
+    <button data-view="songs">♫ <span>Songs</span></button>
+    <button data-view="pads">▦ <span>Cue Pads</span></button>
+    <button data-view="media">▣ <span>Media</span></button>
+    <button data-view="tv">▱ <span>TV Display</span></button>
+    <button data-view="playlist">☰ <span>Playlist</span></button>
+    <button data-view="settings">⚙ <span>Settings</span></button>
+    <button data-view="backup">☁ <span>Backup</span></button>
+    <button data-view="help">? <span>Help</span></button>
+  </nav>
+</aside>
+
+<main class="main">
+<div class="content">
+  <section id="home" class="view active">
+    <div class="top">
+      <div><img class="logo" src="assets/showcue-logo.png"><div class="tag">YOUR SHOW. IN CONTROL.</div></div>
+    </div>
+    <div class="grid">
+      <button class="card" data-view="setlist"><div class="ico">▤</div><h2>SETLIST</h2><p>Create and manage your shows</p></button>
+      <button class="card" data-view="songs"><div class="ico">♫</div><h2>SONGS</h2><p>Audio, lyrics, chords, BPM and more</p></button>
+      <button class="card" data-view="pads"><div class="ico">▦</div><h2>CUE PADS</h2><p>Instant sounds, FX and stingers</p></button>
+      <button class="card" data-view="media"><div class="ico">▣</div><h2>MEDIA</h2><p>Images, videos and backgrounds</p></button>
+      <button class="card" data-view="tv"><div class="ico">▱</div><h2>TV DISPLAY</h2><p>Lyrics, video and graphics to TV</p></button>
+      <button class="card" data-view="playlist"><div class="ico">▶</div><h2>PLAYLIST</h2><p>Build custom playlists</p></button>
+      <button class="card" data-view="settings"><div class="ico">⚙</div><h2>SETTINGS</h2><p>Audio, display, MIDI and more</p></button>
+      <button class="card" data-view="backup"><div class="ico">☁</div><h2>BACKUP</h2><p>Save and restore your data</p></button>
+      <button class="card" data-view="help"><div class="ico">?</div><h2>HELP</h2><p>Guides, support and tutorials</p></button>
+    </div>
+  </section>
+
+  <section id="setlist" class="view"><div class="section"><h1>Setlist</h1><p class="pill">Create shows and control the running order.</p><div class="list" id="setlistItems"></div><button class="btn primary" onclick="addSetlist()">+ Add Song</button></div></section>
+  <section id="songs" class="view"><div class="section"><h1>Songs</h1><p class="pill">Your performance library.</p><div class="list"><div class="row"><div class="grow"><b>Daar Sal Jy My Kry</b><div class="pill">Fanus Pienaar · 3:42 · Audio · Lyrics</div></div><button class="btn primary" onclick="loadSong()">LOAD</button></div><div class="row"><div class="grow"><b>Hey Karolien</b><div class="pill">Audio · Lyrics · Chords</div></div><button class="btn" onclick="loadSong('Hey Karolien')">LOAD</button></div></div></div></section>
+  <section id="pads" class="view"><div class="section"><h1>Cue Pads</h1><p class="pill">Touch-optimised one-shot performance pads.</p><div class="padgrid" id="padgrid"></div></div></section>
+  <section id="media" class="view"><div class="section"><h1>Media</h1><p class="pill">Manage images, video and stage backgrounds.</p><div class="row"><div class="grow"><b>ShowCue Artwork</b><div class="pill">Background image</div></div><button class="btn" onclick="showToast('Media library ready')">OPEN</button></div></div></section>
+  <section id="tv" class="view"><div class="section"><h1>TV Display</h1><p class="pill">Open the performance display. On a second screen, use your device's screen mirroring / external-display feature.</p><button class="btn primary" onclick="openTV()">OPEN TV DISPLAY</button></div></section>
+  <section id="playlist" class="view"><div class="section"><h1>Playlist</h1><p class="pill">Build custom performance playlists.</p><button class="btn primary" onclick="showToast('Playlist created')">+ NEW PLAYLIST</button></div></section>
+  <section id="settings" class="view"><div class="section"><h1>Settings</h1><div class="list"><div class="row"><div class="grow"><b>Touch mode</b><div class="pill">Optimised for phones, tablets and PC</div></div><button class="btn primary">ON</button></div><div class="row"><div class="grow"><b>Large performance controls</b><div class="pill">Use bigger controls while performing</div></div><button class="btn" onclick="showToast('Large controls enabled')">ENABLE</button></div></div></div></section>
+  <section id="backup" class="view"><div class="section"><h1>Backup</h1><p class="pill">Export a portable ShowCue library file.</p><button class="btn primary" onclick="downloadBackup()">EXPORT BACKUP</button></div></section>
+  <section id="help" class="view"><div class="section"><h1>Help</h1><p>ShowCue is designed as a responsive performance control application for touch devices and desktop browsers.</p><p class="pill">GitHub Pages can host the web/PWA version for free.</p></div></section>
+</div>
+</main>
+
+<div class="transport">
+  <div class="track"><img class="thumb" src="assets/showcue-icon-1024.png"><div><b id="trackTitle">Daar Sal Jy My Kry</b><small id="trackArtist">Fanus Pienaar</small></div></div>
+  <span class="time" id="currentTime">0:00</span>
+  <button id="prev" aria-label="Previous">⏮</button>
+  <button id="play" class="play" aria-label="Play">▶</button>
+  <button id="stop" aria-label="Stop">■</button>
+  <button id="next" aria-label="Next">⏭</button>
+  <button id="mute" aria-label="Mute">🔊</button>
+  <button id="tvBtn" aria-label="TV Display">▱</button>
+</div>
+<div class="status">● Ready</div>
+</div>
+
+<div id="modal" class="modal"><div class="modalbox"><h2>Edit Cue Pad</h2><label>Pad name</label><input id="padName"><div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="savePad()">Save</button></div></div></div>
+<div id="tvOverlay" class="tv"><button class="close" onclick="closeTV()">CLOSE</button><div><h1 id="tvTitle">Daar Sal Jy My Kry</h1><p id="tvLyrics">Your lyrics appear here during performance.</p></div></div>
+<div id="toast" style="position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#151e28;border:1px solid #3a4a5a;padding:10px 15px;border-radius:10px;display:none;z-index:60"></div>
+
+<script>
+const state={playing:false,muted:false,padEdit:-1,elapsed:0,sets:["Daar Sal Jy My Kry","Hey Karolien","Luister Na Jou Hart"]};
+const $=s=>document.querySelector(s);
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));window.scrollTo(0,0)}
+document.addEventListener('pointerup',e=>{const b=e.target.closest('[data-view]');if(b){e.preventDefault();showView(b.dataset.view)}});
+function renderPads(){const names=['INTRO','STINGER','APPLAUSE','CHEER','DRUM FILL','VOICE FX','OUTRO','CUSTOM'];$('#padgrid').innerHTML=names.map((n,i)=>`<button class="pad" data-pad="${i}"><button class="edit" data-edit="${i}">✎</button><b>${n}</b><div class="pill" style="margin-top:10px">ONE SHOT</div></button>`).join('')}
+renderPads();
+document.addEventListener('pointerup',e=>{
+ const edit=e.target.closest('[data-edit]'); if(edit){e.preventDefault();e.stopPropagation();state.padEdit=+edit.dataset.edit;$('#padName').value=['INTRO','STINGER','APPLAUSE','CHEER','DRUM FILL','VOICE FX','OUTRO','CUSTOM'][state.padEdit];$('#modal').classList.add('open');return}
+ const pad=e.target.closest('[data-pad]'); if(pad){e.preventDefault();pad.classList.add('play');setTimeout(()=>pad.classList.remove('play'),180);showToast('Cue: '+pad.querySelector('b').textContent)}
+});
+function closeModal(){$('#modal').classList.remove('open')}
+function savePad(){closeModal();showToast('Cue pad saved')}
+function showToast(t){const x=$('#toast');x.textContent=t;x.style.display='block';clearTimeout(showToast.t);showToast.t=setTimeout(()=>x.style.display='none',1400)}
+function setPlaying(v){state.playing=v;$('#play').textContent=v?'❚❚':'▶';showToast(v?'Playing':'Paused')}
+$('#play').addEventListener('pointerup',e=>{e.preventDefault();setPlaying(!state.playing)});
+$('#stop').addEventListener('pointerup',e=>{e.preventDefault();state.elapsed=0;state.playing=false;$('#play').textContent='▶';$('#currentTime').textContent='0:00';showToast('Stopped')});
+$('#prev').addEventListener('pointerup',e=>{e.preventDefault();showToast('Previous')});
+$('#next').addEventListener('pointerup',e=>{e.preventDefault();showToast('Next')});
+$('#mute').addEventListener('pointerup',e=>{e.preventDefault();state.muted=!state.muted;$('#mute').textContent=state.muted?'🔇':'🔊';showToast(state.muted?'Muted':'Unmuted')});
+function openTV(){$('#tvOverlay').classList.add('open');$('#tvTitle').textContent=$('#trackTitle').textContent}
+function closeTV(){$('#tvOverlay').classList.remove('open')}
+$('#tvBtn').addEventListener('pointerup',e=>{e.preventDefault();openTV()});
+function loadSong(name='Daar Sal Jy My Kry'){$('#trackTitle').textContent=name;$('#tvTitle').textContent=name;showToast('Loaded: '+name);showView('songs')}
+function addSetlist(){state.sets.push('New Song');renderSetlist();showToast('Song added')}
+function renderSetlist(){$('#setlistItems').innerHTML=state.sets.map((s,i)=>`<div class="row"><b>${i+1}</b><div class="grow"><b>${s}</b><div class="pill">Ready for performance</div></div><button class="btn primary" onclick="loadSong('${s.replace(/'/g,"\\'")}')">PLAY</button></div>`).join('')}
+renderSetlist();
+function downloadBackup(){const blob=new Blob([JSON.stringify({app:'ShowCue',version:1,sets:state.sets},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='showcue-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
